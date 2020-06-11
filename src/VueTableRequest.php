@@ -1,6 +1,6 @@
 <?php
 
-namespace Kriptiko\LaravelVueTable;
+namespace Kriptiko\VueTable;
 
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Builder;
