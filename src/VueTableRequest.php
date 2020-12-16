@@ -108,7 +108,8 @@ class VueTableRequest
     private function filterColumns()
     {
         foreach ($this->filters as $filter) {
-            $values = $filter['values'];
+            $values    = $filter['values'];
+            $modifiers = $filter['modifiers'] ?? [];
 
             if (Str::contains($filter['column'], '.')) {
                 $relationBits = explode('.', $filter['column']);
@@ -117,22 +118,34 @@ class VueTableRequest
 
                 $relation = implode('.', $relationBits);
 
-                $this->query->whereHas($relation, function (Builder $query) use ($attribute, $values) {
-                    if (is_array($values)) {
-                        $query->whereIn($attribute, $values);
-                    } else {
-                        $this->where($attribute, $values);
-                    }
+                $this->query->whereHas($relation, function (Builder $query) use ($modifiers, $attribute, $values) {
+                    $this->applyFilter($modifiers, $attribute, $values);
                 });
 
                 continue;
             }
 
-            if (is_array($values)) {
-                $this->query->whereIn($filter['column'], $values);
+            $this->applyFilter($modifiers, $filter['column'], $values);
+        }
+    }
+
+    /**
+     * Apply a filter by searching a column and applying the modifiers.
+     *
+     * @param array $modifiers
+     * @param string $attribute
+     * @param $values
+     */
+    protected function applyFilter(array $modifiers, string $attribute, $values)
+    {
+        if (is_array($values)) {
+            if (isset($modifiers['range'])) {
+                $this->query->whereBetween($attribute, $values);
             } else {
-                $this->query->where($filter['column'], $values);
+                $this->query->whereIn($attribute, $values);
             }
+        } else {
+            $this->query->where($attribute, $values);
         }
     }
 
