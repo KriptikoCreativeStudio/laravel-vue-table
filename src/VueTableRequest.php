@@ -119,33 +119,34 @@ class VueTableRequest
                 $relation = implode('.', $relationBits);
 
                 $this->query->whereHas($relation, function (Builder $query) use ($modifiers, $attribute, $values) {
-                    $this->applyFilter($modifiers, $attribute, $values);
+                    $this->applyFilter($query, $modifiers, $attribute, $values);
                 });
 
                 continue;
             }
 
-            $this->applyFilter($modifiers, $filter['column'], $values);
+            $this->applyFilter($this->query, $modifiers, $filter['column'], $values);
         }
     }
 
     /**
      * Apply a filter by searching a column and applying the modifiers.
      *
+     * @param Builder $query
      * @param array $modifiers
      * @param string $attribute
      * @param $values
      */
-    protected function applyFilter(array $modifiers, string $attribute, $values)
+    protected function applyFilter(Builder $query, array $modifiers, string $attribute, $values)
     {
         if (is_array($values)) {
             if (isset($modifiers['range'])) {
-                $this->query->whereBetween($attribute, $values);
+                $query->whereBetween($attribute, $values);
             } else {
-                $this->query->whereIn($attribute, $values);
+                $query->whereIn($attribute, $values);
             }
         } else {
-            $this->query->where($attribute, $values);
+            $query->where($attribute, $values);
         }
     }
 
