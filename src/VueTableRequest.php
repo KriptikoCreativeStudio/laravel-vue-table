@@ -59,6 +59,16 @@ class VueTableRequest
     }
 
     /**
+     * Get the query builder instance.
+     *
+     * @return Builder
+     */
+    public function getQuery(): Builder
+    {
+        return $this->query;
+    }
+
+    /**
      * Runs the query applying filters, sorting and search.
      */
     public function runQuery()
