@@ -117,25 +117,29 @@ class VueTableRequest
      */
     private function filterColumns()
     {
-        foreach ($this->filters as $filter) {
-            $values    = $filter['values'];
-            $modifiers = $filter['modifiers'] ?? [];
+        foreach ($this->columns as $name => $settings) {
+            if (!isset($settings['value'])) {
+                continue;
+            }
 
-            if (Str::contains($filter['column'], '.')) {
-                $relationBits = explode('.', $filter['column']);
+            $value     = $settings['value'] ?? null;
+            $modifiers = $settings['modifiers'] ?? [];
+
+            if (Str::contains($name, '.')) {
+                $relationBits = explode('.', $name);
 
                 $attribute = array_pop($relationBits);
 
                 $relation = implode('.', $relationBits);
 
-                $this->query->whereHas($relation, function (Builder $query) use ($modifiers, $attribute, $values) {
-                    $this->applyFilter($query, $modifiers, $attribute, $values);
+                $this->query->whereHas($relation, function (Builder $query) use ($modifiers, $attribute, $value) {
+                    $this->applyFilter($query, $modifiers, $attribute, $value);
                 });
 
                 continue;
             }
 
-            $this->applyFilter($this->query, $modifiers, $filter['column'], $values);
+            $this->applyFilter($this->query, $modifiers, $name, $value);
         }
     }
 
@@ -186,12 +190,12 @@ class VueTableRequest
         $relations = [];
 
         $this->query->where(function ($query) use (&$relations) {
-            foreach ($this->columns as $column) {
-                $isSearchable = $column['searchable'] ?? false;
+            foreach ($this->columns as $name => $settings) {
+                $isSearchable = (bool)($settings['searchable'] ?? false);
 
-                if (isset($column['name']) && filter_var($isSearchable, FILTER_VALIDATE_BOOLEAN)) {
-                    if (Str::contains($column['name'], '.')) {
-                        $relationBits = explode('.', $column['name']);
+                if ($isSearchable) {
+                    if (Str::contains($name, '.')) {
+                        $relationBits = explode('.', $name);
 
                         $attribute = array_pop($relationBits);
 
@@ -206,7 +210,7 @@ class VueTableRequest
                         continue;
                     }
 
-                    $query->orWhere($column['name'], 'LIKE', sprintf('%%%s%%', $this->search));
+                    $query->orWhere($name, 'LIKE', sprintf('%%%s%%', $this->search));
                 }
             }
         });
