@@ -181,7 +181,7 @@ class VueTableRequest
      */
     private function searchColumns()
     {
-        $relations = [];
+        $relations = $this->query->getEagerLoads();
 
         $this->query->where(function ($query) use (&$relations) {
             foreach ($this->columns as $name => $settings) {
