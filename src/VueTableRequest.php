@@ -40,11 +40,6 @@ class VueTableRequest
     protected $search;
 
     /**
-     * @var array
-     */
-    protected $sorting;
-
-    /**
      * VueTableRequest constructor.
      *
      * @param Builder $query
@@ -77,7 +72,6 @@ class VueTableRequest
         $this->filters = $this->request->get('filters') ?? [];
         $this->perPage = $this->request->get('perPage') ?? 15;
         $this->search  = $this->request->get('search') ?? '';
-        $this->sorting = $this->request->get('sorting') ?? [];
 
         $this->filterColumns();
         $this->sortColumns();
@@ -169,16 +163,16 @@ class VueTableRequest
      */
     private function sortColumns()
     {
-        foreach ($this->sorting as $sort) {
-            if (!isset($sort['column']) || !isset($sort['direction'])) {
-                continue;
-            }
+        $sortTypes = ['asc', 'desc'];
 
-            if (!in_array($sort['direction'], ['asc', 'desc'])) {
-                continue;
-            }
+        foreach ($this->columns as $name => $settings) {
+            if (isset($settings['sort'])) {
+                $sort = strtolower($settings['sort']);
 
-            $this->query->orderBy($sort['column'], $sort['direction']);
+                if (in_array($sort, $sortTypes)) {
+                    $this->query->orderBy($name, $sort);
+                }
+            }
         }
     }
 
