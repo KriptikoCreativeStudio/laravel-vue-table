@@ -76,6 +76,8 @@ class VueTableRequest
         $this->filterColumns();
         $this->sortColumns();
         $this->searchColumns();
+
+        $this->query->select($this->extractColumnNames());
     }
 
     /**
@@ -85,7 +87,7 @@ class VueTableRequest
      */
     public function paginated()
     {
-        return $this->query->paginate($this->perPage, $this->extractColumnNames());
+        return $this->query->paginate($this->perPage);
     }
 
     /**
@@ -97,9 +99,9 @@ class VueTableRequest
     {
         $names = [];
 
-        foreach ($this->columns as $column) {
-            if (isset($column['name']) && !Str::contains($column['name'], '.')) {
-                $names[] = $column['name'];
+        foreach ($this->columns as $column => $columnData) {
+            if (!Str::contains($column, '.')) {
+                $names[] = $column;
             }
         }
 
