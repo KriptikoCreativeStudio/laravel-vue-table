@@ -81,6 +81,16 @@ class VueTableRequest
     }
 
     /**
+     * Add subselect queries to count the relations.
+     *
+     * @param mixed $relations
+     */
+    public function withCount($relations)
+    {
+        $this->query->withCount($relations);
+    }
+
+    /**
      * Get the query result.
      *
      * @return LengthAwarePaginator
