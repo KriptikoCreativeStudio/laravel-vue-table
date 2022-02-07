@@ -87,7 +87,7 @@ class VueTableRequest
      */
     public function withCount($relations)
     {
-        $this->query->withCount($relations);
+        $this->query->withCount(is_array($relations) ? $relations : func_get_args());
     }
 
     /**
