@@ -33,6 +33,18 @@ class PostController extends Controller
 ```
 
 
+### Using withCount
+
+To use withCount, you need to define the relationships after a new `VueTableRequest` object is instantiated.
+So you usually just need to do something like the following example:
+
+```
+$vtr = new VueTableRequest(User::query());
+$vtr->withCount('comments');
+$paginator  = $vtr->paginated();
+```
+
+
 ---
 
 
