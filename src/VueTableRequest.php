@@ -42,7 +42,7 @@ class VueTableRequest
     /**
      * VueTableRequest constructor.
      *
-     * @param Builder $query
+     * @param  Builder  $query
      */
     public function __construct(Builder $query)
     {
@@ -71,7 +71,7 @@ class VueTableRequest
         $this->columns = $this->request->get('columns') ?? [];
         $this->filters = $this->request->get('filters') ?? [];
         $this->perPage = $this->request->get('perPage') ?? 15;
-        $this->search  = $this->request->get('search') ?? '';
+        $this->search = $this->request->get('search') ?? '';
 
         $this->filterColumns();
         $this->sortColumns();
@@ -83,7 +83,7 @@ class VueTableRequest
     /**
      * Add subselect queries to count the relations.
      *
-     * @param mixed $relations
+     * @param  mixed  $relations
      */
     public function withCount($relations)
     {
@@ -110,7 +110,7 @@ class VueTableRequest
         $names = [];
 
         foreach ($this->columns as $column => $columnData) {
-            if (!Str::contains($column, '.')) {
+            if (! Str::contains($column, '.')) {
                 $names[] = $column;
             }
         }
@@ -124,11 +124,11 @@ class VueTableRequest
     private function filterColumns()
     {
         foreach ($this->columns as $name => $settings) {
-            if (!isset($settings['value'])) {
+            if (! isset($settings['value'])) {
                 continue;
             }
 
-            $value     = $settings['value'] ?? null;
+            $value = $settings['value'] ?? null;
             $modifiers = $settings['modifiers'] ?? [];
 
             if (Str::contains($name, '.')) {
@@ -152,9 +152,9 @@ class VueTableRequest
     /**
      * Apply a filter by searching a column and applying the modifiers.
      *
-     * @param Builder $query
-     * @param array $modifiers
-     * @param string $attribute
+     * @param  Builder  $query
+     * @param  array  $modifiers
+     * @param  string  $attribute
      * @param $values
      */
     protected function applyFilter(Builder $query, array $modifiers, string $attribute, $values)
@@ -197,7 +197,7 @@ class VueTableRequest
 
         $this->query->where(function ($query) use (&$relations) {
             foreach ($this->columns as $name => $settings) {
-                $isSearchable = (bool)($settings['searchable'] ?? false);
+                $isSearchable = filter_var($settings['searchable'], FILTER_VALIDATE_BOOLEAN);
 
                 if ($isSearchable) {
                     if (Str::contains($name, '.')) {
